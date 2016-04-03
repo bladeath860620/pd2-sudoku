@@ -16,6 +16,5 @@ class Sudoku
 		void BT(int , int);
 		void set_zero(int,int,int);
 		bool check(int,int,int);
-		void check_bool(int,int);
 };
 #endif

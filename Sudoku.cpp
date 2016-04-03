@@ -9,24 +9,11 @@ using namespace std;
 
 int su[9][9];
 int su2[9][9] = {{0}};
-int save[9] = {0};
-int su3[9][9][10];//z -> 0 for not usable 1 for usable 
+int su3[9][9][10]; 
 bool have_zero = false;
-int su4[9][9][10] = {{{0}}};
 int x, y;
 int ans[9][9]={{0}};
 int ans_count = 0;
-
-void Sudoku::check_bool(int i, int j)
-{
-	int k;
-	cout <<"("<<i<<","<<j<<")'s bool : ";
-	for(k=1; k<10; k++)
-	{
-		cout << su3[i][j][k] << " ";
-	}
-	cout << endl;
-}
 
 bool Sudoku::check(int i, int j, int k)
 {
@@ -80,11 +67,6 @@ void Sudoku::BT(int i, int j)
 			su3[i][j][0] = k;
 			m = i;
 			n = j;
-			/*if(n==9)
-			{
-				n=0;
-				m++;
-			}*/
 			while(su3[m][n][0] != 0)
 			{
 				n++;
@@ -106,14 +88,6 @@ void Sudoku::BT(int i, int j)
 						ans[a][b] = su3[a][b][0];
 					}
 				}
-				/*for(a=0; a<9; a++)
-				{
-					for(b=0; b<9; b++)
-					{
-						cout << ans[a][b] << " ";
-					}
-					cout << endl;
-				}*/
 			}
 			else
 				BT(m ,n);
@@ -134,16 +108,12 @@ void Sudoku::set_zero(int i, int j, int k)
 		for(b=j3; b<=j3+2; b++)
 		{
 			su3[a][b][k] = 0;
-			/*cout << "first" << endl;
-			check_bool(0,0);*/
 		}
 	}
 	for(a=0; a<9; a++)
 	{
 		su3[i][a][k] = 0;
 		su3[a][j][k] = 0;
-		/*cout << "second" << endl;
-		check_bool(0,0);*/
 	}
 	for(b=1; b<10; b++)
 	{
@@ -184,13 +154,11 @@ void Sudoku::solve()
 	{
 		for(j=0; j<9; j++)
 		{
-			//scanf("%d", &su3[i][j][0]);
 			n = su3[i][j][0];
 			if(n != 0)
 			{
 				if(su3[i][j][n] == 0)
 				{
-					//cout << "(i,j) = " <<"("<< i << ","<<j<<") "<< "N: " << n<<endl;
 					cout << '0' << endl;
 					return;
 				}
@@ -198,30 +166,6 @@ void Sudoku::solve()
 			}
 		}
 	}
-	/*for(loop=0; loop<3; loop++)
-	{
-		for(i=0; i<9; i++)
-		{
-			for(j=0; j<9; j++)
-			{
-				for(k=1; k<10; k++)
-				{
-					if(su3[i][j][k] == 0)
-						count++;
-					else if(su3[i][j][k] == 1)
-						possible = k;
-				}
-				if(count == 8)
-				{
-					//cout << "(i,j) = " <<"("<< i << ","<<j<<") "<< "Possible: " << possible <<endl;
-					su3[i][j][0] = possible;
-					//cout << "-----("<<i<<","<<j<<")-----"<<endl;
-					set_zero(i,j,possible);
-				}
-				count = 0;
-			}
-		}
-	}*/
 	for(i=0; i<9; i++)
 	{
 		for(j=0; j<9 ;j++)
@@ -233,7 +177,6 @@ void Sudoku::solve()
 					have_zero = true;
 					x = i;
 					y = j;
-					//cout << "FIRST ZERO: "<< i << "," << j<< endl;
 				}
 			}
 			if(i==8 && j==8 && have_zero == false)
@@ -245,18 +188,6 @@ void Sudoku::solve()
 			su[i][j] = su3[i][j][0];
 		}
 	}
-	/*have_zero = false;
-	for(i=0; i<9; i++)
-	{
-		for(j=0; j<9; j++)
-		{
-			if(su3[i][j][0] == 0)
-			{
-				have_zero = true;
-			}
-		}
-	}*/
-	//------------simple solving------------
 	if(have_zero == true)
 	{
 		BT(x, y);
@@ -277,15 +208,8 @@ void Sudoku::solve()
 	{
 		cout << '2' << endl;
 	}
-	/*}
-	else if(have_zero == false)
-	{
-		cout << '1' <<endl;
-		sudo_print();
-	}*/
 	else if(ans_count == 0)
 		cout << '0'<< endl;
-	//-----------advanced solving-----------
 }
 
 void Sudoku::sudo_print()
@@ -300,7 +224,6 @@ void Sudoku::sudo_print()
 				cout << endl;
 		}
 	}
-	//cout << "-----------------" << endl;
 }
 
 void Sudoku::giveQuestion()
@@ -406,7 +329,6 @@ void Sudoku::readIn()
 
 void Sudoku::transform()
 {
-	//question_trans();
 	srand(time(NULL));
 	int i;
 	int n1, n2, n3, n4, n5, n6, n7, n8;
@@ -571,5 +493,4 @@ void Sudoku::changeRow(int a, int b)
 			su[i+n][j] = temp;
 		}
 	}
-
 }
