@@ -27,9 +27,7 @@ bool Sudoku::check(int i, int j, int k)
 			if(a!=i && b!=j)
 			{
 				if(su3[a][b][0] == k)
-				{
 					return false;
-				}
 			}
 		}
 	}
@@ -38,16 +36,12 @@ bool Sudoku::check(int i, int j, int k)
 		if(a!=j)
 		{
 			if(su3[i][a][0] == k)
-			{
 				return false;
-			}
 		}
 		if(a!=i)
 		{
 			if(su3[a][j][0] == k)
-			{
 				return false;
-			}
 		}
 	}
 	return true;
@@ -124,14 +118,7 @@ void Sudoku::set_zero(int i, int j, int k)
 void Sudoku::solve()
 {
 	int i, j, k;
-	int i3, j3;
-	int a, b;
 	int n;
-	int square = 0;
-	int count;
-	int possible;
-	int loop;
-	bool no_ans = false;
 	
 	for(i=0; i<9; i++)
 	{
