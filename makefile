@@ -1,5 +1,7 @@
-all:
-	g++ Sudoku.cpp giveQuestion.cpp -o q -g
-	g++ Sudoku.cpp transform.cpp -o t -g
-	g++ Sudoku.cpp solve.cpp -o s -g
-	g++ Sudoku.cpp main.cpp -o Sudoku
+all: Sudoku.o giveQuestion.cpp solve.cpp transform.cpp
+	g++ -o giveQuestion giveQuestion.cpp Sudoku.o
+	g++ -o solve solve.cpp Sudoku.o
+	g++ -o transform transform.cpp Sudoku.o
+
+Sudoku.o: Sudoku.cpp Sudoku.h
+	g++ -c Sudoku.cpp -o Sudoku.o
