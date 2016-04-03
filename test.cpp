@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
-#include <algorithm>
 #include "Sudoku.h"
 
 using namespace std;
@@ -12,12 +11,12 @@ int su2[9][9] = {{0}};
 int save[9] = {0};
 int su3[9][9][10];//z -> 0 for not usable 1 for usable 
 bool have_zero = false;
-int su4[9][9][10] = {{{0}}};
 int x, y;
+int mm, nn;
 int ans[9][9]={{0}};
 int ans_count = 0;
 
-void Sudoku::check_bool(int i, int j)
+/*void Sudoku::check_bool(int i, int j)
 {
 	int k;
 	cout <<"("<<i<<","<<j<<")'s bool : ";
@@ -26,7 +25,7 @@ void Sudoku::check_bool(int i, int j)
 		cout << su3[i][j][k] << " ";
 	}
 	cout << endl;
-}
+}*/
 
 bool Sudoku::check(int i, int j, int k)
 {
@@ -39,7 +38,7 @@ bool Sudoku::check(int i, int j, int k)
 		{
 			if(a!=i && b!=j)
 			{
-				if(su3[a][b][0] == k)
+				if(su[a][b] == k)
 				{
 					return false;
 				}
@@ -50,14 +49,14 @@ bool Sudoku::check(int i, int j, int k)
 	{
 		if(a!=j)
 		{
-			if(su3[i][a][0] == k)
+			if(su[i][a] == k)
 			{
 				return false;
 			}
 		}
 		if(a!=i)
 		{
-			if(su3[a][j][0] == k)
+			if(su[a][j] == k)
 			{
 				return false;
 			}
@@ -70,61 +69,51 @@ void Sudoku::BT(int i, int j)
 {
 	int k;
 	int a, b;
-	int m,n;
+	int m, n;
 	if(ans_count == 2)
 		return;
 	for(k=1; k<10; k++)
 	{
-		if(check(i,j,k))
+		if(k == 9 && check(i,j,k) == false)
+			return;
+		else if(check(i,j,k))
 		{
-			su3[i][j][0] = k;
+			su[i][j] = k;
 			m = i;
 			n = j;
-			/*if(n==9)
+			while(su[m][n] != 0)
 			{
-				n=0;
-				m++;
-			}*/
-			while(su3[m][n][0] != 0)
-			{
-				n++;
+				n = n+1;
 				if(n==9)
 				{
 					n=0;
-					m++;
+					m = m+1;
 				}
 				if(m==9)
 					break;
 			}
 			if(m==9)
 			{
-				ans_count++;
 				for(a=0; a<9; a++)
 				{
 					for(b=0 ;b<9; b++)
 					{
-						ans[a][b] = su3[a][b][0];
+						ans[a][b] = su[a][b];
 					}
 				}
-				/*for(a=0; a<9; a++)
-				{
-					for(b=0; b<9; b++)
-					{
-						cout << ans[a][b] << " ";
-					}
-					cout << endl;
-				}*/
+				ans_count++;
+				//sudo_print();
 			}
 			else
+			{
 				BT(m ,n);
-			su3[i][j][0] = 0;
+				su[i][j] = 0;
+			}
 		}
-		else if(k == 9 && check(i,j,k) == false)
-			return;
 	}
 }
 
-void Sudoku::set_zero(int i, int j, int k)
+/*void Sudoku::set_zero(int i, int j, int k)
 {
 	int a, b, i3, j3;
 	i3 = (i/3)*3;
@@ -134,36 +123,24 @@ void Sudoku::set_zero(int i, int j, int k)
 		for(b=j3; b<=j3+2; b++)
 		{
 			su3[a][b][k] = 0;
-			/*cout << "first" << endl;
-			check_bool(0,0);*/
 		}
 	}
 	for(a=0; a<9; a++)
 	{
 		su3[i][a][k] = 0;
 		su3[a][j][k] = 0;
-		/*cout << "second" << endl;
-		check_bool(0,0);*/
 	}
 	for(b=1; b<10; b++)
 	{
 		su3[i][j][b] = 0;
 	}
-}
+}*/
 
 void Sudoku::solve()
 {
-	int i, j, k;
-	int i3, j3;
-	int a, b;
-	int n;
-	int square = 0;
-	int count;
-	int possible;
-	int loop;
-	bool no_ans = false;
+	int i, j;
 	
-	for(i=0; i<9; i++)
+	/*for(i=0; i<9; i++)
 	{
 		for(j=0; j<9; j++)
 		{
@@ -179,8 +156,8 @@ void Sudoku::solve()
 				su3[i][j][k] = 1;
 			}
 		}
-	}
-	for(i=0; i<9; i++)
+	}*/
+	/*for(i=0; i<9; i++)
 	{
 		for(j=0; j<9; j++)
 		{
@@ -197,7 +174,7 @@ void Sudoku::solve()
 				set_zero(i,j,n);
 			}
 		}
-	}
+	}*/
 	/*for(loop=0; loop<3; loop++)
 	{
 		for(i=0; i<9; i++)
@@ -226,7 +203,7 @@ void Sudoku::solve()
 	{
 		for(j=0; j<9 ;j++)
 		{
-			if(su3[i][j][0] == 0)
+			if(su[i][j] == 0)
 			{
 				if(have_zero == false)
 				{
@@ -236,13 +213,6 @@ void Sudoku::solve()
 					//cout << "FIRST ZERO: "<< i << "," << j<< endl;
 				}
 			}
-			if(i==8 && j==8 && have_zero == false)
-			{
-				ans_count = 1;
-				cout << '1' << endl;
-				sudo_print();
-			}
-			su[i][j] = su3[i][j][0];
 		}
 	}
 	/*have_zero = false;
@@ -255,36 +225,36 @@ void Sudoku::solve()
 				have_zero = true;
 			}
 		}
-	}*/
+	}
 	//------------simple solving------------
 	if(have_zero == true)
-	{
-		BT(x, y);
-	}
-	if(ans_count == 1 && have_zero == true)
-	{
-		for(i=0; i<9; i++)
+	{*/
+		BT(x,y);
+		//cout << "ANS_COUNT: "<< ans_count <<endl;
+		if(ans_count == 1)
 		{
-			for(j=0; j<9 ;j++)
+			for(i=0; i<9; i++)
 			{
-				su[i][j] = ans[i][j];
+				for(j=0; j<9 ;j++)
+				{
+					su[i][j] = ans[i][j];
+				}
 			}
+			cout << '1' << endl;
+			sudo_print();
 		}
-		cout << '1' << endl;
-		sudo_print();
-	}
-	else if(ans_count == 2)
-	{
-		cout << '2' << endl;
-	}
+		else if(ans_count == 2)
+		{
+			cout << '2' << endl;
+		}
 	/*}
 	else if(have_zero == false)
 	{
 		cout << '1' <<endl;
 		sudo_print();
 	}*/
-	else if(ans_count == 0)
-		cout << '0'<< endl;
+	else
+		cout << "WTF" << endl;
 	//-----------advanced solving-----------
 }
 
@@ -389,6 +359,8 @@ void Sudoku::giveQuestion()
 			su[8][7]=4;
 			break;
 	}
+	/*question_trans();
+	sudo_print();*/
 	transform();
 }
 
@@ -435,6 +407,35 @@ void Sudoku::transform()
 	sudo_print();
 }
 
+/*void Sudoku::question_trans()
+{
+	srand(time(NULL));
+	int i;
+	int n1, n2, n3, n4, n5, n6, n7, n8;
+	for(i=0; i<44; i++)
+	{
+		n1 = rand() % 9+1;
+		n2 = rand() % 9+1;
+		while(n2 == n1)
+			n2 = rand() % 9+1;
+		changeNum(n1, n2);
+	}
+	n3 = rand() % 2;
+	flip(n3);
+	n4 = 3;
+	rotate(n4);
+	n5 = rand() % 3;
+	n6 = rand() % 3;
+	while(n6 == n5)
+		n6 = rand() % 3;
+	changeRow(n5, n6);
+	n7 = rand() % 3;
+	n8 = rand() % 3;
+	while(n8 == n7)
+		n8 = rand() % 3;
+	changeCol(1, 0);
+}*/
+
 void Sudoku::changeNum(int a, int b)
 {
 	int i, j;
@@ -459,7 +460,7 @@ void Sudoku::flip(int n)
 		{
 			for(j=0; j<9; j++)
 			{
-				su2[i][8-j] = su[i][j];
+				su2[8-i][j] = su[i][j];
 			}
 		}
 	}
@@ -469,7 +470,7 @@ void Sudoku::flip(int n)
 		{
 			for(j=0; j<9; j++)
 			{
-				su2[8-i][j] = su[i][j];
+				su2[i][8-j] = su[i][j];
 			}
 		}
 	}
@@ -497,6 +498,13 @@ void Sudoku::rotate(int n)
 				su2[i][j] = su[8-j][i];
 			}
 		}
+		for(i=0; i<9; i++)
+		{
+			for(j=0; j<9; j++)
+			{
+				su[i][j] = su2[i][j];
+			}
+		}
 	}
 	else if(n==2)
 	{
@@ -505,6 +513,13 @@ void Sudoku::rotate(int n)
 			for(j=0; j<9; j++)
 			{
 				su2[8-i][8-j] = su[i][j];
+			}
+		}
+		for(i=0; i<9; i++)
+		{
+			for(j=0; j<9; j++)
+			{
+				su[i][j] = su2[i][j];
 			}
 		}
 	}
@@ -517,12 +532,184 @@ void Sudoku::rotate(int n)
 				su2[i][j] = su[j][8-i];
 			}
 		}
-	}	
-	for(i=0; i<9; i++)
-	{
-		for(j=0; j<9; j++)
+		for(i=0; i<9; i++)
 		{
-			su[i][j] = su2[i][j];
+			for(j=0; j<9; j++)
+			{
+				su[i][j] = su2[i][j];
+			}
+		}
+	}	
+}
+
+void Sudoku::changeRow(int a, int b)
+{
+	int i, j;
+	if(a == 0)
+	{
+		if(b == 1)
+		{
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+3][j];
+				}
+			}
+			for(i=3; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-3][j];
+				}
+			}
+			for(i=0; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 2)
+		{
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+6][j];
+				}
+			}
+			for(i=6; i<8; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-6][j];
+				}
+			}
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+			for(i=6; i<8; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+	}
+	else if(a == 1)
+	{
+		if(b == 0)
+		{
+			for(i=3; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-3][j];
+				}
+			}
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+3][j];
+				}
+			}
+			for(i=0; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 2)
+		{
+			for(i=3; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+3][j];
+				}
+			}
+			for(i=6; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-3][j];
+				}
+			}
+			for(i=3; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+	}
+	else if(a == 2)
+	{
+		if(b == 0)
+		{
+			for(i=6; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-6][j];
+				}
+			}
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+6][j];
+				}
+			}
+			for(i=0; i<3; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+			for(i=6; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 1)
+		{
+			for(i=6; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i-3][j];
+				}
+			}
+			for(i=3; i<6; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su2[i][j] = su[i+3][j];
+				}
+			}
+			for(i=3; i<9; i++)
+			{
+				for(j=0; j<9; j++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
 		}
 	}
 }
@@ -530,46 +717,171 @@ void Sudoku::rotate(int n)
 void Sudoku::changeCol(int a, int b)
 {
 	int i, j;
-	int temp;
-	int n;
-	if(a>b)
+	if(a == 0)
 	{
-		temp = a;
-		a = b;
-		b = temp;
-	}
-	n = 3*(b-a);
-	for(i = 0; i < 9; i++)
-	{
-		for(j = a*3;j < a*3+3; j++)
+		if(b == 1)
 		{
-			temp = su[i][j];
-			su[i][j] = su[i][j+n];
-			su[i][j+n] = temp;
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+3];
+				}
+			}
+			for(j=3; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-3];
+				}
+			}
+			for(j=0; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 2)
+		{
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+6];
+				}
+			}
+			for(j=6; j<8; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-6];
+				}
+			}
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+			for(j=6; j<8; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
 		}
 	}
-}
-
-void Sudoku::changeRow(int a, int b)
-{
-	int i, j;
-	int temp;
-	int n;
-	if(a>b)
+	else if(a == 1)
 	{
-		temp = a;
-		a = b;
-		b = temp;
-	}
-	n = 3*(b-a);
-	for(i = a * 3; i < a*3+3; i++)
-	{
-		for(j = 0; j < 9; j++)
+		if(b == 0)
 		{
-			temp = su[i][j];
-			su[i][j] = su[i+n][j];
-			su[i+n][j] = temp;
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+3];
+				}
+			}
+			for(j=3; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-3];
+				}
+			}
+			for(j=0; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 2)
+		{
+			for(j=3; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+3];
+				}
+			}
+			for(j=6; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-3];
+				}
+			}
+			for(j=3; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
 		}
 	}
-
+	else if(a == 2)
+	{
+		if(b == 0)
+		{
+			for(j=6; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-6];
+				}
+			}
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+6];
+				}
+			}
+			for(j=0; j<3; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+			for(j=6; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+		else if(b == 1)
+		{
+			for(j=6; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j-3];
+				}
+			}
+			for(j=3; j<6; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su2[i][j] = su[i][j+3];
+				}
+			}
+			for(j=3; j<9; j++)
+			{
+				for(i=0; i<9; i++)
+				{
+					su[i][j] = su2[i][j];
+				}
+			}
+		}
+	}
 }
