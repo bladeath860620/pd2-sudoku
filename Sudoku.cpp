@@ -2,23 +2,164 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
-#include "sudoku.h"
+#include "Sudoku.h"
 
 using namespace std;
 
 int su[9][9];
 int su2[9][9] = {{0}};
 int save[9] = {0};
-int su3[9][9][10];
+int su3[9][9][10];//z -> 0 for not usable 1 for usable 
+bool have_zero = false;
+int su4[9][9][10] = {{{0}}};
+int x, y;
+int mm, nn;
+int ans[9][9];
+int ans_count = 0;
 
-void Sudoku::BT()
+void Sudoku::check_bool(int i, int j)
 {
+	int k;
+	cout <<"("<<i<<","<<j<<")'s bool : ";
+	for(k=1; k<10; k++)
+	{
+		cout << su3[i][j][k] << " ";
+	}
+	cout << endl;
+}
 
+bool Sudoku::check(int i, int j, int k)
+{
+	int a, b, i3, j3;
+	//cout << "("<<i<<","<<j<<")"<<endl;
+	i3 = (i/3)*3;
+	j3 = (j/3)*3;
+	for(a=i3; a<=i3+2; a++)
+	{
+		for(b=j3; b<=j3+2; b++)
+		{
+			if(su3[a][b][0] == k)
+			{
+				//cout << k << " == false ;" << endl;
+				return false;
+			}
+		}
+	}
+	for(a=0; a<9; a++)
+	{
+		if(su3[i][a][0] == k)
+		{
+			//cout << k << " == false ;" << endl;
+			return false;
+		}
+		if(su3[a][j][0] == k)
+		{
+			//cout << k << " == false ;" << endl;
+			return false;
+		}
+	}
+	//cout << k << " == true ;" << endl;
+	return true;
+}
+
+void Sudoku::BT(int i, int j)
+{
+	int k;
+	int a, b;
+	int m,n;
+	bool boo = false;
+	cout << "("<<i<<","<<j<<")"<<endl;
+	if(ans_count == 2)
+	{
+		cout << "WTF" <<endl;
+		return;
+	}
+	for(k=1; k<10; k++)
+	{
+		if(check(i,j,k) && su3[i][j][k] == 1)
+		{
+			cout << "??" <<endl;
+			su3[i][j][0] = k;
+			m = i;
+			n= j+1;
+			if(n==9)
+			{
+				n=0;
+				m++;
+			}
+			cout << "???" <<endl;
+			while(su3[m][n][0] != 0)
+			{
+				n++;
+				if(n==9)
+				{
+					n=0;
+					m++;
+				}
+				cout << ".." << endl;
+			}
+			if(m==9)
+			{
+				ans_count++;
+				for(i=0; i<9; i++)
+				{
+					for(j=0 ;j<9; j++)
+					{
+						ans[i][j] = su3[i][j][0];
+					}
+				}
+			}
+			BT(m ,n);
+			su3[i][j][0] = 0;
+		}
+		else if(k == 9 && check(i,j,k) == false)
+		{
+			boo = true;
+			cout << "("<<i<<","<<j<<")"<<endl;
+			return;
+		}
+	}
+	/*
+	if(i==8 && j==8)
+	{
+		for(i=0; i<9; i++)
+		{
+			for(j=0; j<9; j++)
+			{
+				su[i][j]= su3[i][j][0];
+			}
+		}
+		sudo_print();
+	}*/
+}
+
+void Sudoku::set_zero(int i, int j, int k)
+{
+	int a, b, i3, j3;
+	i3 = (i/3)*3;
+	j3 = (j/3)*3;
+	for(a=i3; a<=i3+2; a++)
+	{
+		for(b=j3; b<=j3+2; b++)
+		{
+			su3[a][b][k] = 0;
+			cout << "first" << endl;
+			check_bool(0,0);
+		}
+	}
+	for(a=0; a<9; a++)
+	{
+		su3[i][a][k] = 0;
+		su3[a][j][k] = 0;
+		cout << "second" << endl;
+		check_bool(0,0);
+	}
 }
 
 void Sudoku::solve()
 {
 	int i, j, k;
+	int i3, j3;
 	int a, b;
 	int n;
 	int square = 0;
@@ -92,13 +233,6 @@ void Sudoku::solve()
 	{
 		for(j=0; j<9; j++)
 		{
-			su3[i][j][0] = 0;
-		}
-	}
-	for(i=0; i<9; i++)
-	{
-		for(j=0; j<9; j++)
-		{
 			su3[i][j][0] = su[i][j];
 		}
 	}
@@ -116,7 +250,7 @@ void Sudoku::solve()
 	{
 		for(j=0; j<9; j++)
 		{
-			scanf("%d", &su3[i][j][0]);
+			//scanf("%d", &su3[i][j][0]);
 			n = su3[i][j][0];
 			if(n != 0)
 			{
@@ -124,13 +258,13 @@ void Sudoku::solve()
 				{
 					//cout << "(i,j) = " <<"("<< i << ","<<j<<") "<< "N: " << n<<endl;
 					cout << '0' << endl;
-					exit(1);
+					return;
 				}
-				for(k=1; k<10; k++)
-					su3[i][j][k] = 0;
-				for(a=(i/3)*3; a<=((i/3)*3)+2; a++)
+				i3 = (i/3)*3;
+				j3 = (j/3)*3;
+				for(a=i3; a<=i3+2; a++)
 				{
-					for(b=(j/3)*3; b<=((j/3)*3)+2; b++)
+					for(b=j3; b<=j3+2; b++)
 					{
 						su3[a][b][n] = 0;
 					}
@@ -158,13 +292,12 @@ void Sudoku::solve()
 			{
 				//cout << "(i,j) = " <<"("<< i << ","<<j<<") "<< "Possible: " << possible <<endl;
 				su3[i][j][0] = possible;
+				cout << "-----("<<i<<","<<j<<")-----"<<endl;
+				set_zero(i,j,possible);
 			}
 			count = 0;
 		}
 	}
-	//------------simple solving------------
-	
-	//-----------advanced solving-----------
 	for(i=0; i<9; i++)
 	{
 		for(j=0; j<9 ;j++)
@@ -172,7 +305,25 @@ void Sudoku::solve()
 			su[i][j] = su3[i][j][0];
 		}
 	}
-	sudo_print();
+	//------------simple solving------------
+	BT(x, y);
+	if(ans_count == 1)
+	{
+		for(i=0; i<9; i++)
+		{
+			for(j=0; j<9 ;j++)
+			{
+				su[i][j] = ans[i][j];
+			}
+		}
+		cout << '1' << endl;
+		sudo_print();
+	}
+	else if(ans_count == 2)
+	{
+		cout << '2' << endl;
+	}
+	//-----------advanced solving-----------
 }
 
 void Sudoku::sudo_print()
@@ -187,6 +338,7 @@ void Sudoku::sudo_print()
 				cout << endl;
 		}
 	}
+	cout << "-----------------" << endl;
 }
 
 void Sudoku::giveQuestion()
@@ -275,8 +427,9 @@ void Sudoku::giveQuestion()
 			su[8][7]=4;
 			break;
 	}
-	question_trans();
-	sudo_print();
+	/*question_trans();
+	sudo_print();*/
+	transform();
 }
 
 void Sudoku::readIn()
@@ -287,17 +440,49 @@ void Sudoku::readIn()
 		for(j=0; j<9; j++)
 		{
 			scanf("%d", &su[i][j]);
+			if(have_zero == false)
+			{
+				cout << "Zero location : " <<i<<" , "<<j<<endl; 
+				have_zero = true;
+				x = i;
+				y = j;
+			}
 		}
 	}
 }
 
 void Sudoku::transform()
 {
-	question_trans();
+	//question_trans();
+	srand(time(NULL));
+	int i;
+	int n1, n2, n3, n4, n5, n6, n7, n8;
+	for(i=0; i<44; i++)
+	{
+		n1 = rand() % 9+1;
+		n2 = rand() % 9+1;
+		while(n2 == n1)
+			n2 = rand() % 9+1;
+		changeNum(n1, n2);
+	}
+	n3 = rand() % 2;
+	flip(n3);
+	n4 = 3;
+	rotate(n4);
+	n5 = rand() % 3;
+	n6 = rand() % 3;
+	while(n6 == n5)
+		n6 = rand() % 3;
+	changeRow(n5, n6);
+	n7 = rand() % 3;
+	n8 = rand() % 3;
+	while(n8 == n7)
+		n8 = rand() % 3;
+	changeCol(n7, n8);
 	sudo_print();
 }
 
-void Sudoku::question_trans()
+/*void Sudoku::question_trans()
 {
 	srand(time(NULL));
 	int i;
@@ -324,7 +509,7 @@ void Sudoku::question_trans()
 	while(n8 == n7)
 		n8 = rand() % 3;
 	changeCol(1, 0);
-}
+}*/
 
 void Sudoku::changeNum(int a, int b)
 {
