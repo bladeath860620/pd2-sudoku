@@ -31,34 +31,46 @@ void Sudoku::check_bool(int i, int j)
 bool Sudoku::check(int i, int j, int k)
 {
 	int a, b, i3, j3;
-	//cout << "("<<i<<","<<j<<")"<<endl;
 	i3 = (i/3)*3;
 	j3 = (j/3)*3;
 	for(a=i3; a<=i3+2; a++)
 	{
 		for(b=j3; b<=j3+2; b++)
 		{
-			if(su3[a][b][0] == k)
+			if(a!=i && b!=j)
 			{
-				//cout << k << " == false ;" << endl;
-				return false;
+				if(su3[a][b][0] == k)
+				{
+					return false;
+				}
 			}
 		}
 	}
-	for(a=0; a<9; a++)
+	for(a=0; a<j; a++)
 	{
 		if(su3[i][a][0] == k)
 		{
-			//cout << k << " == false ;" << endl;
 			return false;
 		}
 		if(su3[a][j][0] == k)
 		{
-			//cout << k << " == false ;" << endl;
 			return false;
 		}
 	}
-	//cout << k << " == true ;" << endl;
+	if(j!=8)
+	{
+		for(a=j+1; a<9; a++)
+		{
+			if(su3[i][a][0] == k)
+			{
+				return false;
+			}
+			if(su3[a][j][0] == k)
+			{
+				return false;
+			}
+		}
+	}
 	return true;
 }
 
@@ -66,21 +78,21 @@ void Sudoku::BT(int i, int j)
 {
 	int k;
 	int a, b;
-	int m, n;
+	int m,n;
 	if(ans_count == 2)
 		return;
 	for(k=1; k<10; k++)
 	{
-		if(check(i,j,k) && su3[i][j][k] == 1)
+		if(check(i,j,k))
 		{
 			su3[i][j][0] = k;
 			m = i;
-			n= j+1;
-			if(n==9)
+			n = j;
+			/*if(n==9)
 			{
 				n=0;
 				m++;
-			}
+			}*/
 			while(su3[m][n][0] != 0)
 			{
 				n++;
@@ -100,8 +112,17 @@ void Sudoku::BT(int i, int j)
 						ans[i][j] = su3[i][j][0];
 					}
 				}
+				for(i=0; i<9; i++)
+				{
+					for(j=0; j<9; j++)
+					{
+						cout << ans[i][j] << " ";
+					}
+					cout << endl;
+				}
 			}
-			BT(m ,n);
+			else
+				BT(m ,n);
 			su3[i][j][0] = 0;
 		}
 		else if(k == 9 && check(i,j,k) == false)
