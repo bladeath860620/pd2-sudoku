@@ -118,13 +118,22 @@ void Sudoku::set_zero(int i, int j, int k)
 void Sudoku::solve()
 {
 	int i, j, k;
+	int a,b;
+	int i3, j3;
 	int n;
+	int count = 0;
+	int used[9] = {0};
 	
 	for(i=0; i<9; i++)
 	{
 		for(j=0; j<9; j++)
 		{
 			su3[i][j][0] = su[i][j];
+			if(su[i][j]>9 || su[i][j]<0)
+			{
+				cout << '0' << endl;
+				exit(1);
+			}
 		}
 	}
 	for(i=0; i<9; i++)
@@ -150,6 +159,37 @@ void Sudoku::solve()
 					return;
 				}
 				set_zero(i,j,n);
+			}
+		}
+	}
+	for(i=0; i<3; i++)
+	{
+		for(j=0; j<3; j++)
+		{
+			i3 = i*3;
+			j3 = j*3;
+			for(k=1; k<10; k++)
+			{
+				for(a=i3; a<i3+3; a++)
+				{
+					for(b=j3; b<j3+3; b++)
+					{
+						if(su3[a][b][k] == 0)
+						{
+							count++;
+						}
+						if(su3[a][b][0]!=0)
+							used[su3[a][b][0]-1]++;
+					}
+				}
+				if(count == 9 && used[k-1] == 0)
+				{
+					cout << '0' << endl;
+					exit(1);
+				}
+				count = 0;
+				for(a=0; a<9; a++)
+					used[a] = 0;
 			}
 		}
 	}
@@ -196,7 +236,7 @@ void Sudoku::solve()
 		cout << '2' << endl;
 	}
 	else if(ans_count == 0)
-		cout << '0'<< endl;
+		cout << '0' << endl;
 }
 
 void Sudoku::sudo_print()
